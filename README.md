@@ -1,7 +1,7 @@
 Role Name
 =========
 
-The Resilio Sync service.
+The Elastic Stack, aka ELK.
 
 Requirements
 ------------
@@ -11,7 +11,7 @@ TODO
 Role Variables
 --------------
 
-None.
+TODO
 
 Dependencies
 ------------
@@ -24,7 +24,7 @@ Example Playbook
 ```
 - hosts: servers
   roles:
-      - { role: kurron.resilio-sync }
+      - { role: kurron.elastic-stack }
 ```
 
 License

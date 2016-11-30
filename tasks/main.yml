@@ -1,58 +1,47 @@
 ---
-- name: Install Resilio Repository
-  become: yes
-  apt_repository:
-      repo: 'deb http://linux-packages.resilio.com/resilio-sync/deb resilio-sync non-free'
-      state: present
-  when: (ansible_distribution == "Ubuntu") and (resilio_sync_install)
-
-- name: Install Resilio Repository
-  become: yes
-  copy:
-      src: files/resilio-sync.repo
-      dest: /etc/yum.repos.d/resilio-sync.repo
-      mode: 0444
-  when: (ansible_distribution == "Fedora") and (resilio_sync_install)
-
-- name: Install Resilio Key
+- name: Install Elasticsearch Key
   become: yes
   apt_key:
-      url: https://linux-packages.resilio.com/resilio-sync/key.asc
+      url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
       state: present
-  when: (ansible_distribution == "Ubuntu") and (resilio_sync_install)
+  when: (ansible_distribution == "Ubuntu") and (elastic_elasticsearch_install)
 
-- name: Install Resilio Key
+
+- name: Install Elasticsearch Repository
   become: yes
-  command: rpm --import https://linux-packages.resilio.com/resilio-sync/key.asc
-  when: (ansible_distribution == "Fedora") and (resilio_sync_install)
+  apt_repository:
+      repo: "deb https://artifacts.elastic.co/packages/{{ elastic_stack_version }}/apt stable main"
+      state: present
+  when: (ansible_distribution == "Ubuntu") and (elastic_elasticsearch_install)
 
-- name: Install Resilio Sync
+- name: Install Elasticsearch
   become: yes
   apt:
-      name: resilio-sync
+      name: elasticsearch
       update_cache: yes
       state: present
       allow_unauthenticated: yes
-  when: (ansible_distribution == "Ubuntu") and (resilio_sync_install)
+  when: (ansible_distribution == "Ubuntu") and (elastic_elasticsearch_install)
 
-- name: Install Resilio Sync
+- name: Adjust Elasticsearch Configuration
   become: yes
-  shell: dnf --assumeyes install resilio-sync
-  when: (ansible_distribution == "Fedora") and (resilio_sync_install)
+  lineinfile:
+      dest: /etc/default/elasticsearch
+      line: "JAVA_HOME={{ jdk_global_jdk_directory }}"
+  when: (ansible_distribution == "Ubuntu") and (elastic_elasticsearch_install)
 
-- name: Install Resilio Configuration File
+- name: Enable Elasticsearch
   become: yes
-  template:
-      src: templates/config.json.j2
-      dest: "/etc/resilio-sync/config.json"
-  when: resilio_sync_install
+  shell: systemctl daemon-reload && systemctl enable elasticsearch.service
+  when: elastic_elasticsearch_install
 
-- name: Enable Sync As Sync User
+- name: Start Elasticsearch
   become: yes
-  command: systemctl enable resilio-sync
-  when: resilio_sync_install
+  command: systemctl restart elasticsearch.service
+  when: elastic_elasticsearch_install
 
-- name: Start Sync As Sync User
-  become: yes
-  command: systemctl restart resilio-sync
-  when: resilio_sync_install
+# not working for some reason
+- name: Test Elasticsearch
+  become: no
+  command: "curl -XGET 'localhost:9200/?pretty'"
+  when: false
