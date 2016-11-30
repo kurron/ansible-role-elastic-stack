@@ -4,7 +4,7 @@
   apt_key:
       url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
       state: present
-  when: (ansible_distribution == "Ubuntu") and (elastic_elasticsearch_install)
+  when: (ansible_distribution == "Ubuntu")
 
 
 - name: Install Elasticsearch Repository
@@ -12,7 +12,7 @@
   apt_repository:
       repo: "deb https://artifacts.elastic.co/packages/{{ elastic_stack_version }}/apt stable main"
       state: present
-  when: (ansible_distribution == "Ubuntu") and (elastic_elasticsearch_install)
+  when: (ansible_distribution == "Ubuntu")
 
 - name: Install Elasticsearch
   become: yes
@@ -45,3 +45,22 @@
   become: no
   command: "curl -XGET 'localhost:9200/?pretty'"
   when: false
+
+- name: Install Kibana
+  become: yes
+  apt:
+      name: kibana
+      update_cache: yes
+      state: present
+      allow_unauthenticated: yes
+  when: (ansible_distribution == "Ubuntu") and (elastic_kibana_install)
+
+- name: Enable Kibana
+  become: yes
+  shell: systemctl daemon-reload && systemctl enable kibana.service
+  when: elastic_kibana_install
+
+- name: Start Kibana
+  become: yes
+  command: systemctl restart kibana.service
+  when: elastic_kibana_install

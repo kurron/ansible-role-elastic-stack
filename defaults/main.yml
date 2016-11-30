@@ -1,3 +1,4 @@
 ---
 elastic_elasticsearch_install: true
+elastic_kibana_install: true
 elastic_stack_version: 5.x
