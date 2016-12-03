@@ -116,3 +116,17 @@
   become: yes
   command: update-rc.d filebeat defaults 95 10
   when: elastic_filebeat_install
+
+- name: Install Metricbeat
+  become: yes
+  apt:
+      name: metricbeat
+      update_cache: yes
+      state: present
+      allow_unauthenticated: yes
+  when: (ansible_distribution == "Ubuntu") and (elastic_metricbeat_install)
+
+- name: Enable Metricbeat
+  become: yes
+  command: update-rc.d metricbeat defaults 95 10
+  when: elastic_metricbeat_install
