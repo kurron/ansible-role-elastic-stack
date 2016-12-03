@@ -2,4 +2,7 @@
 elastic_elasticsearch_install: true
 elastic_kibana_install: true
 elastic_logstash_install: true
+elastic_packetbeat_install: true
+elastic_metricbeat_install: true
+elastic_filebeat_install: true
 elastic_stack_version: 5.x

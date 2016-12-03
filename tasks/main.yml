@@ -68,6 +68,8 @@
 - name: Install X-Pack
   become: yes
   shell: "cd /usr/share/elasticsearch && bin/elasticsearch-plugin install x-pack --batch"
+  args:
+      creates: /usr/share/elasticsearch/plugins/x-pack/LICENSE.txt
   when: elastic_elasticsearch_install or elastic_kibana_install
 
 # Don't bother fighting it -- Logstash wants Java in a particular spot
@@ -100,3 +102,17 @@
   become: yes
   command: systemctl restart logstash.service
   when: elastic_logstash_install
+
+- name: Install Filebeat
+  become: yes
+  apt:
+      name: filebeat
+      update_cache: yes
+      state: present
+      allow_unauthenticated: yes
+  when: (ansible_distribution == "Ubuntu") and (elastic_filebeat_install)
+
+- name: Enable Filebeat
+  become: yes
+  command: update-rc.d filebeat defaults 95 10
+  when: elastic_filebeat_install
