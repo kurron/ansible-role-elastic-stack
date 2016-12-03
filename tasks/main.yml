@@ -55,6 +55,15 @@
       allow_unauthenticated: yes
   when: (ansible_distribution == "Ubuntu") and (elastic_kibana_install)
 
+# Not sure how stable the interface is but works with my Vagrant boxes
+- name: Adjust Kibana Configuration
+  become: yes
+  lineinfile:
+      dest: /etc/kibana/kibana.yml
+      line: 'server.host: "{{ansible_enp0s8.ipv4.address}}"'
+      state: present
+  when: (ansible_distribution == "Ubuntu") and (elastic_kibana_install)
+
 - name: Enable Kibana
   become: yes
   shell: systemctl daemon-reload && systemctl enable kibana.service
@@ -64,6 +73,8 @@
   become: yes
   command: systemctl restart kibana.service
   when: elastic_kibana_install
+
+# Hit http://192.168.1.75:5601/ with kibana/changeme to test things out
 
 - name: Install X-Pack
   become: yes
