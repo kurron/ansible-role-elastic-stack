@@ -130,3 +130,17 @@
   become: yes
   command: update-rc.d metricbeat defaults 95 10
   when: elastic_metricbeat_install
+
+- name: Install Packetbeat
+  become: yes
+  apt:
+      name: packetbeat
+      update_cache: yes
+      state: present
+      allow_unauthenticated: yes
+  when: (ansible_distribution == "Ubuntu") and (elastic_packetbeat_install)
+
+- name: Enable Packetbeat
+  become: yes
+  command: update-rc.d packetbeat defaults 95 10
+  when: elastic_packetbeat_install
