@@ -6,7 +6,6 @@
       state: present
   when: (ansible_distribution == "Ubuntu")
 
-
 - name: Install Elasticsearch Repository
   become: yes
   apt_repository:
@@ -64,3 +63,12 @@
   become: yes
   command: systemctl restart kibana.service
   when: elastic_kibana_install
+
+- name: Install Logstash
+  become: yes
+  apt:
+      name: logstash
+      update_cache: yes
+      state: present
+      allow_unauthenticated: yes
+  when: (ansible_distribution == "Ubuntu") and (elastic_logstash_install)
