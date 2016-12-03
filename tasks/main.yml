@@ -65,6 +65,11 @@
   command: systemctl restart kibana.service
   when: elastic_kibana_install
 
+- name: Install X-Pack
+  become: yes
+  shell: "cd /usr/share/elasticsearch && bin/elasticsearch-plugin install x-pack --batch"
+  when: elastic_elasticsearch_install or elastic_kibana_install
+
 # Don't bother fighting it -- Logstash wants Java in a particular spot
 - name: Soft-link java executable
   become: yes
