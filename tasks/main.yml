@@ -27,6 +27,7 @@
   lineinfile:
       dest: /etc/default/elasticsearch
       line: "JAVA_HOME={{ jdk_global_jdk_directory }}"
+      state: present
   when: (ansible_distribution == "Ubuntu") and (elastic_elasticsearch_install)
 
 - name: Enable Elasticsearch
@@ -64,6 +65,15 @@
   command: systemctl restart kibana.service
   when: elastic_kibana_install
 
+# Don't bother fighting it -- Logstash wants Java in a particular spot
+- name: Soft-link java executable
+  become: yes
+  file:
+      src: "{{ jdk_global_jdk_directory }}/bin/java"
+      dest: "/usr/bin/java"
+      state: link
+  when: elastic_logstash_install
+
 - name: Install Logstash
   become: yes
   apt:
@@ -72,3 +82,16 @@
       state: present
       allow_unauthenticated: yes
   when: (ansible_distribution == "Ubuntu") and (elastic_logstash_install)
+
+# NOTE: because of permissions, to test logstash by nand as described in the documentation you have to do this:
+# sudo --user logstash bin/logstash  -e 'input { stdin { } } output { stdout {} }'
+
+- name: Enable Logstash
+  become: yes
+  shell: systemctl daemon-reload && systemctl enable logstash.service
+  when: elastic_logstash_install
+
+- name: Start Logstash
+  become: yes
+  command: systemctl restart logstash.service
+  when: elastic_logstash_install
