@@ -67,7 +67,7 @@
   when: (ansible_distribution == "Ubuntu") and (elastic_kibana_install)
 
 # Not sure how stable the interface is but works with my Vagrant boxes
-- name: Adjust Kibana Configuration
+- name: Install Custom Kibana Configuration
   become: yes
   template:
       src: templates/kibana.yml.j2
@@ -149,9 +149,23 @@
       allow_unauthenticated: yes
   when: (ansible_distribution == "Ubuntu") and (elastic_metricbeat_install)
 
+- name: Install Custom Metricbeat Configuration
+  become: yes
+  template:
+      src: templates/metricbeat.yml.j2
+      dest: /etc/metricbeat/metricbeat.yml
+      mode: 0644
+      backup: yes
+  when: elastic_metricbeat_install
+
 - name: Enable Metricbeat
   become: yes
-  command: update-rc.d metricbeat defaults 95 10
+  command: systemctl enable metricbeat
+  when: elastic_metricbeat_install
+
+- name: Start Metricbeat
+  become: yes
+  command: systemctl restart metricbeat
   when: elastic_metricbeat_install
 
 - name: Install Packetbeat
