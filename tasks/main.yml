@@ -69,15 +69,12 @@
 # Not sure how stable the interface is but works with my Vagrant boxes
 - name: Adjust Kibana Configuration
   become: yes
-  lineinfile:
+  template:
+      src: templates/kibana.yml.j2
       dest: /etc/kibana/kibana.yml
-      line: "{{ item }}"
-      state: present
-  with_items:
-      - 'server.host: "{{ansible_enp0s8.ipv4.address}}"'
-      - 'elasticsearch.username: "elastic"'
-      - 'elasticsearch.password: "changeme"'
-  when: (ansible_distribution == "Ubuntu") and (elastic_kibana_install)
+      mode: 0644
+      backup: yes
+  when: elastic_kibana_install
 
 - name: Enable Kibana
   become: yes

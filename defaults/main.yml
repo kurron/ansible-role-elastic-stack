@@ -2,7 +2,7 @@
 elastic_elasticsearch_install: true
 elastic_elasticsearch_cluster_name: development
 elastic_elasticsearch_node_name: development
-elastic_kibana_install: false
+elastic_kibana_install: true
 elastic_logstash_install: false
 elastic_packetbeat_install: false
 elastic_metricbeat_install: false
