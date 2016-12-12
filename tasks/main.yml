@@ -168,6 +168,13 @@
   command: systemctl restart metricbeat
   when: elastic_metricbeat_install
 
+- name: Install Metricbeat Dashboards
+  become: yes
+  command: "./scripts/import_dashboards -es http://{{ ansible_enp0s8.ipv4.address }}:9200"
+  args:
+      chdir: /usr/share/metricbeat
+  when: elastic_metricbeat_install
+
 - name: Install Packetbeat
   become: yes
   apt:
