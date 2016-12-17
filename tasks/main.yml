@@ -123,6 +123,16 @@
       backup: yes
   when: elastic_logstash_install
 
+# To test do: echo '{"version": "1.1","host":"example.org","short_message":"A short message that helps you identify what is going on","full_message":"Backtrace here\n\nmore stuff","level":1,"_user_id":9001,"_some_info":"foo","_some_env_var":"bar"}' | gzip | nc -u -w 1 192.168.1.78 12201
+- name: Install GELF Logstash Configuration
+  become: yes
+  template:
+      src: templates/gelf-to-elasticsearch.conf.j2
+      dest: /etc/logstash/conf.d/gelf-to-elasticsearch.conf
+      mode: 0644
+      backup: yes
+  when: elastic_logstash_install
+
 - name: Enable Logstash
   become: yes
   shell: systemctl daemon-reload && systemctl enable logstash.service
