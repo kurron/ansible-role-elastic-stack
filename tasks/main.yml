@@ -133,6 +133,15 @@
       backup: yes
   when: elastic_logstash_install
 
+- name: Install Heartbeat Logstash Configuration
+  become: yes
+  template:
+      src: templates/heartbeat-to-elasticsearch.conf.j2
+      dest: /etc/logstash/conf.d/heartbeat-to-elasticsearch.conf
+      mode: 0644
+      backup: yes
+  when: elastic_logstash_install
+
 - name: Enable Logstash
   become: yes
   shell: systemctl daemon-reload && systemctl enable logstash.service
@@ -234,4 +243,4 @@
   command: "./scripts/import_dashboards -es http://{{ ansible_enp0s8.ipv4.address }}:9200"
   args:
       chdir: /usr/share/metricbeat
-  when: elastic_metricbeat_install or elastic_filebeat_install or elastic_pcketbeat_install
+  when: elastic_metricbeat_install or elastic_filebeat_install or elastic_packetbeat_install
