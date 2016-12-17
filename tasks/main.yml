@@ -135,9 +135,23 @@
       allow_unauthenticated: yes
   when: (ansible_distribution == "Ubuntu") and (elastic_filebeat_install)
 
+- name: Install Custom Filebeat Configuration
+  become: yes
+  template:
+      src: templates/filebeat.yml.j2
+      dest: /etc/filebeat/filebeat.yml
+      mode: 0644
+      backup: yes
+  when: elastic_filebeat_install
+
 - name: Enable Filebeat
   become: yes
-  command: update-rc.d filebeat defaults 95 10
+  command: systemctl enable filebeat
+  when: elastic_filebeat_install
+
+- name: Start Filebeat
+  become: yes
+  command: systemctl restart filebeat
   when: elastic_filebeat_install
 
 - name: Install Metricbeat
