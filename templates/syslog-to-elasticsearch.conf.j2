@@ -1,0 +1,12 @@
+input {
+    syslog {
+        type => syslog
+        port => {{ elastic_logstash_syslog_port }}
+    }
+}
+
+output {
+    elasticsearch {
+        hosts => ["{{ ansible_enp0s8.ipv4.address }}"]
+    }
+}

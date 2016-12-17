@@ -113,8 +113,15 @@
       allow_unauthenticated: yes
   when: (ansible_distribution == "Ubuntu") and (elastic_logstash_install)
 
-# NOTE: because of permissions, to test logstash by nand as described in the documentation you have to do this:
-# sudo --user logstash bin/logstash  -e 'input { stdin { } } output { stdout {} }'
+# To test this, you can issue from a reomote machine: logger --server 192.168.1.78 --port 5514 --priority 0  --tag test 'Hello, World!'
+- name: Install Syslog Logstash Configuration
+  become: yes
+  template:
+      src: templates/syslog-to-elasticsearch.conf.j2
+      dest: /etc/logstash/conf.d/syslog-to-elasticsearch.conf
+      mode: 0644
+      backup: yes
+  when: elastic_logstash_install
 
 - name: Enable Logstash
   become: yes
@@ -146,7 +153,7 @@
 
 - name: Enable Filebeat
   become: yes
-  command: systemctl enable filebeat
+  shell: systemctl daemon-reload && systemctl enable filebeat
   when: elastic_filebeat_install
 
 - name: Start Filebeat
@@ -174,7 +181,7 @@
 
 - name: Enable Metricbeat
   become: yes
-  command: systemctl enable metricbeat
+  shell: systemctl daemon-reload && systemctl enable metricbeat
   when: elastic_metricbeat_install
 
 - name: Start Metricbeat
@@ -202,7 +209,7 @@
 
 - name: Enable Packetbeat
   become: yes
-  command: systemctl enable packetbeat
+  shell: systemctl daemon-reload && systemctl enable packetbeat
   when: elastic_packetbeat_install
 
 - name: Start Packetbeat
@@ -210,6 +217,8 @@
   command: systemctl restart packetbeat
   when: elastic_packetbeat_install
 
+# all beats have the script but you only need to run it once
+# TODO: figure out a way to determine if we need to run the script or not
 - name: Install Beat Dashboards And Indices
   become: yes
   command: "./scripts/import_dashboards -es http://{{ ansible_enp0s8.ipv4.address }}:9200"

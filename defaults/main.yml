@@ -3,7 +3,8 @@ elastic_elasticsearch_install: true
 elastic_elasticsearch_cluster_name: development
 elastic_elasticsearch_node_name: development
 elastic_kibana_install: true
-elastic_logstash_install: false
+elastic_logstash_install: true
+elastic_logstash_syslog_port: 5514
 elastic_packetbeat_install: true
 elastic_metricbeat_install: true
 elastic_filebeat_install: true
