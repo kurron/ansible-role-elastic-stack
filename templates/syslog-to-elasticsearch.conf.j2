@@ -1,7 +1,9 @@
 input {
     syslog {
-        type => syslog
+        type => "syslog"
         port => {{ elastic_logstash_syslog_port }}
+        id => "{{ ansible_hostname }}"
+        timezone => "{{ ansible_date_time.tz }}"
     }
 }
 
