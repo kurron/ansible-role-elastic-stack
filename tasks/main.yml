@@ -182,13 +182,6 @@
   command: systemctl restart metricbeat
   when: elastic_metricbeat_install
 
-- name: Install Metricbeat Dashboards
-  become: yes
-  command: "./scripts/import_dashboards -es http://{{ ansible_enp0s8.ipv4.address }}:9200"
-  args:
-      chdir: /usr/share/metricbeat
-  when: elastic_metricbeat_install
-
 - name: Install Packetbeat
   become: yes
   apt:
@@ -198,7 +191,28 @@
       allow_unauthenticated: yes
   when: (ansible_distribution == "Ubuntu") and (elastic_packetbeat_install)
 
+- name: Install Custom Packetbeat Configuration
+  become: yes
+  template:
+      src: templates/packetbeat.yml.j2
+      dest: /etc/packetbeat/packetbeat.yml
+      mode: 0644
+      backup: yes
+  when: elastic_packetbeat_install
+
 - name: Enable Packetbeat
   become: yes
-  command: update-rc.d packetbeat defaults 95 10
+  command: systemctl enable packetbeat
   when: elastic_packetbeat_install
+
+- name: Start Packetbeat
+  become: yes
+  command: systemctl restart packetbeat
+  when: elastic_packetbeat_install
+
+- name: Install Beat Dashboards And Indices
+  become: yes
+  command: "./scripts/import_dashboards -es http://{{ ansible_enp0s8.ipv4.address }}:9200"
+  args:
+      chdir: /usr/share/metricbeat
+  when: elastic_metricbeat_install or elastic_filebeat_install or elastic_pcketbeat_install
