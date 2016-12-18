@@ -18,9 +18,12 @@ Role Variables
 * elastic_logstash_install: true
 * elastic_logstash_syslog_port: 5514
 * elastic_logstash_gelf_port: 12201
-* elastic_packetbeat_install: true
-* elastic_metricbeat_install: true
-* elastic_filebeat_install: true
+* elastic_packetbeat_install: false
+* elastic_packetbeat_elasticsearch_host: 10.0.2.15
+* elastic_metricbeat_install: false
+* elastic_metricbeat_elasticsearch_host: 10.0.2.15
+* elastic_filebeat_install: false
+* elastic_filebeat_elasticsearch_host: 10.0.2.15
 * elastic_x_pack_install: false
 * elastic_stack_version: 5.x
 

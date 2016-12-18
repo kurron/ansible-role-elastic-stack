@@ -9,6 +9,6 @@ input {
 
 output {
     elasticsearch {
-        hosts => ["{{ elastic_logstash_elasticsearch_host }}"]
+        hosts => ["{{ ansible_default_ipv4.address }}"]
     }
 }
