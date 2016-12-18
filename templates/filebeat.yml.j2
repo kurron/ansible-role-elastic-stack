@@ -83,7 +83,7 @@ name: {{ ansible_hostname }}
 #-------------------------- Elasticsearch output ------------------------------
 output.elasticsearch:
   # Array of hosts to connect to.
-  hosts: ["{{ ansible_enp0s8.ipv4.address }}:9200"]
+  hosts: ["{{ elastic_filebeat_elasticsearch_host }}:9200"]
 
   # Optional protocol and basic auth credentials.
   #protocol: "https"
@@ -115,4 +115,3 @@ output.elasticsearch:
 # To enable all selectors use ["*"]. Examples of other selectors are "beat",
 # "publish", "service".
 #logging.selectors: ["*"]
-

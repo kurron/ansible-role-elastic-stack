@@ -240,7 +240,7 @@
 # TODO: figure out a way to determine if we need to run the script or not
 - name: Install Beat Dashboards And Indices
   become: yes
-  command: "./scripts/import_dashboards -es http://{{ ansible_enp0s8.ipv4.address }}:9200"
+  command: "./scripts/import_dashboards -es http://127.0.0.1:9200"
   args:
       chdir: /usr/share/metricbeat
   when: elastic_metricbeat_install or elastic_filebeat_install or elastic_packetbeat_install
