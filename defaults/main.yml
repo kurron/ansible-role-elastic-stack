@@ -11,6 +11,6 @@ elastic_packetbeat_elasticsearch_host: 10.0.2.15
 elastic_metricbeat_install: false
 elastic_metricbeat_elasticsearch_host: 10.0.2.15
 elastic_filebeat_install: false
-elastic_filebeat_elasticsearch_host: 10.0.2.15
+elastic_filebeat_elasticsearch_host: 10.0.2.118
 elastic_x_pack_install: false
 elastic_stack_version: 5.x

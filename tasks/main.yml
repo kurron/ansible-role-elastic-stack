@@ -9,6 +9,7 @@
       - elasticsearch
       - kibana
       - logstash
+      - filebeat
 
 - name: Install Elasticsearch Repository
   become: yes
@@ -20,6 +21,7 @@
       - elasticsearch
       - kibana
       - logstash
+      - filebeat
 
 - name: Install Elasticsearch Repository
   become: yes
@@ -35,6 +37,7 @@
       - elasticsearch
       - kibana
       - logstash
+      - filebeat
 
 - name: Install Elasticsearch
   become: yes
@@ -223,7 +226,6 @@
         name: logstash
         state: present
         update_cache: yes
-
   when: (ansible_distribution == "RedHat") and (elastic_logstash_install)
   tags:
       - logstash
@@ -285,6 +287,18 @@
       state: present
       allow_unauthenticated: yes
   when: (ansible_distribution == "Ubuntu") and (elastic_filebeat_install)
+  tags:
+      - filebeat
+
+- name: Install Filebeat
+  become: yes
+  yum:
+        name: filebeat
+        state: present
+        update_cache: yes
+  when: (ansible_distribution == "RedHat") and (elastic_filebeat_install)
+  tags:
+      - filebeat
 
 - name: Install Custom Filebeat Configuration
   become: yes
@@ -294,16 +308,22 @@
       mode: 0644
       backup: yes
   when: elastic_filebeat_install
+  tags:
+      - filebeat
 
 - name: Enable Filebeat
   become: yes
   shell: systemctl daemon-reload && systemctl enable filebeat
   when: elastic_filebeat_install
+  tags:
+      - filebeat
 
 - name: Start Filebeat
   become: yes
   command: systemctl restart filebeat
   when: elastic_filebeat_install
+  tags:
+      - filebeat
 
 - name: Install Metricbeat
   become: yes
