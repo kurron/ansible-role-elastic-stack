@@ -124,6 +124,29 @@
       state: present
       allow_unauthenticated: yes
   when: (ansible_distribution == "Ubuntu") and (elastic_kibana_install)
+  tags:
+      - kibana
+
+- name: Install Kibana
+  become: yes
+  apt:
+      name: kibana
+      update_cache: yes
+      state: present
+      allow_unauthenticated: yes
+  when: (ansible_distribution == "Ubuntu") and (elastic_kibana_install)
+  tags:
+      - kibana
+
+- name: Install Kibana
+  become: yes
+  yum:
+      name: kibana
+      state: present
+      update_cache: yes
+  when: (ansible_distribution == "RedHat") and (elastic_kibana_install)
+  tags:
+      - kibana
 
 # Not sure how stable the interface is but works with my Vagrant boxes
 - name: Install Custom Kibana Configuration
@@ -134,16 +157,22 @@
       mode: 0644
       backup: yes
   when: elastic_kibana_install
+  tags:
+      - kibana
 
 - name: Enable Kibana
   become: yes
   shell: systemctl daemon-reload && systemctl enable kibana.service
   when: elastic_kibana_install
+  tags:
+      - kibana
 
 - name: Start Kibana
   become: yes
   command: systemctl restart kibana.service
   when: elastic_kibana_install
+  tags:
+      - kibana
 
 # Hit http://192.168.1.75:5601/ with kibana/changeme to test things out
 
