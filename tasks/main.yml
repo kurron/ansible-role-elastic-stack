@@ -10,6 +10,7 @@
       - kibana
       - logstash
       - filebeat
+      - metricbeat
 
 - name: Install Elasticsearch Repository
   become: yes
@@ -22,6 +23,7 @@
       - kibana
       - logstash
       - filebeat
+      - metricbeat
 
 - name: Install Elasticsearch Repository
   become: yes
@@ -38,6 +40,7 @@
       - kibana
       - logstash
       - filebeat
+      - metricbeat
 
 - name: Install Elasticsearch
   become: yes
@@ -333,6 +336,18 @@
       state: present
       allow_unauthenticated: yes
   when: (ansible_distribution == "Ubuntu") and (elastic_metricbeat_install)
+  tags:
+      - metricbeat
+
+- name: Install Metricbeat
+  become: yes
+  yum:
+        name: metricbeat
+        state: present
+        update_cache: yes
+  when: (ansible_distribution == "RedHat") and (elastic_metricbeat_install)
+  tags:
+      - metricbeat
 
 - name: Install Custom Metricbeat Configuration
   become: yes
@@ -342,16 +357,22 @@
       mode: 0644
       backup: yes
   when: elastic_metricbeat_install
+  tags:
+      - metricbeat
 
 - name: Enable Metricbeat
   become: yes
   shell: systemctl daemon-reload && systemctl enable metricbeat
   when: elastic_metricbeat_install
+  tags:
+      - metricbeat
 
 - name: Start Metricbeat
   become: yes
   command: systemctl restart metricbeat
   when: elastic_metricbeat_install
+  tags:
+      - metricbeat
 
 - name: Install Packetbeat
   become: yes
@@ -389,3 +410,7 @@
   args:
       chdir: /usr/share/metricbeat
   when: elastic_metricbeat_install or elastic_filebeat_install or elastic_packetbeat_install
+  tags:
+      - filebeat
+      - metricbeat
+      - packetbeat
