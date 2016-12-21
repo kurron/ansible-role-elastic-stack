@@ -8,6 +8,6 @@ input {
 
 output {
     elasticsearch {
-        hosts => ["{{ ansible_default_ipv4.address }}"]
+        hosts => ["{{ ansible_host }}"]
     }
 }

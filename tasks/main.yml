@@ -7,6 +7,8 @@
   when: (ansible_distribution == "Ubuntu")
   tags:
       - elasticsearch
+      - kibana
+      - logstash
 
 - name: Install Elasticsearch Repository
   become: yes
@@ -16,6 +18,8 @@
   when: (ansible_distribution == "Ubuntu")
   tags:
       - elasticsearch
+      - kibana
+      - logstash
 
 - name: Install Elasticsearch Repository
   become: yes
@@ -29,6 +33,8 @@
   when: (ansible_distribution == "RedHat")
   tags:
       - elasticsearch
+      - kibana
+      - logstash
 
 - name: Install Elasticsearch
   become: yes
@@ -174,7 +180,13 @@
   tags:
       - kibana
 
-# Hit http://192.168.1.75:5601/ with kibana/changeme to test things out
+- name: Test Kibina
+  become: no
+  uri:
+      url: "http://{{ ansible_host }}:5601/"
+  when: false
+  tags:
+      - kibana
 
 - name: Install X-Pack
   become: yes
@@ -191,6 +203,8 @@
       dest: "/usr/bin/java"
       state: link
   when: elastic_logstash_install
+  tags:
+      - logstash
 
 - name: Install Logstash
   become: yes
@@ -200,6 +214,19 @@
       state: present
       allow_unauthenticated: yes
   when: (ansible_distribution == "Ubuntu") and (elastic_logstash_install)
+  tags:
+      - logstash
+
+- name: Install Logstash
+  become: yes
+  yum:
+        name: logstash
+        state: present
+        update_cache: yes
+
+  when: (ansible_distribution == "RedHat") and (elastic_logstash_install)
+  tags:
+      - logstash
 
 # To test this, you can issue from a reomote machine: logger --server 192.168.1.78 --port 5514 --priority 0  --tag test 'Hello, World!'
 - name: Install Syslog Logstash Configuration
@@ -210,6 +237,8 @@
       mode: 0644
       backup: yes
   when: elastic_logstash_install
+  tags:
+      - logstash
 
 # To test do: echo '{"version": "1.1","host":"example.org","short_message":"A short message that helps you identify what is going on","full_message":"Backtrace here\n\nmore stuff","level":1,"_user_id":9001,"_some_info":"foo","_some_env_var":"bar"}' | gzip | nc -u -w 1 192.168.1.78 12201
 - name: Install GELF Logstash Configuration
@@ -220,6 +249,8 @@
       mode: 0644
       backup: yes
   when: elastic_logstash_install
+  tags:
+      - logstash
 
 - name: Install Heartbeat Logstash Configuration
   become: yes
@@ -229,16 +260,22 @@
       mode: 0644
       backup: yes
   when: elastic_logstash_install
+  tags:
+      - logstash
 
 - name: Enable Logstash
   become: yes
   shell: systemctl daemon-reload && systemctl enable logstash.service
   when: elastic_logstash_install
+  tags:
+      - logstash
 
 - name: Start Logstash
   become: yes
   command: systemctl restart logstash.service
   when: elastic_logstash_install
+  tags:
+      - logstash
 
 - name: Install Filebeat
   become: yes
