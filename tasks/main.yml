@@ -5,6 +5,8 @@
       url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
       state: present
   when: (ansible_distribution == "Ubuntu")
+  tags:
+      - elasticsearch
 
 - name: Install Elasticsearch Repository
   become: yes
@@ -12,6 +14,21 @@
       repo: "deb https://artifacts.elastic.co/packages/{{ elastic_stack_version }}/apt stable main"
       state: present
   when: (ansible_distribution == "Ubuntu")
+  tags:
+      - elasticsearch
+
+- name: Install Elasticsearch Repository
+  become: yes
+  yum_repository:
+      name: "elastic-{{ elastic_stack_version }}"
+      description: Elastic Package Repository
+      baseurl: "https://artifacts.elastic.co/packages/{{ elastic_stack_version }}/yum"
+      gpgcheck: yes
+      gpgkey: "https://artifacts.elastic.co/GPG-KEY-elasticsearch"
+      state: present
+  when: (ansible_distribution == "RedHat")
+  tags:
+      - elasticsearch
 
 - name: Install Elasticsearch
   become: yes
@@ -21,6 +38,18 @@
       state: present
       allow_unauthenticated: yes
   when: (ansible_distribution == "Ubuntu") and (elastic_elasticsearch_install)
+  tags:
+      - elasticsearch
+
+- name: Install Elasticsearch
+  become: yes
+  yum:
+      name: elasticsearch
+      state: present
+      update_cache: yes
+  when: (ansible_distribution == "RedHat") and (elastic_elasticsearch_install)
+  tags:
+      - elasticsearch
 
 - name: Adjust Elasticsearch Launch Configuration
   become: yes
@@ -30,6 +59,19 @@
       line: "JAVA_HOME={{ jdk_global_jdk_directory }}"
       state: present
   when: (ansible_distribution == "Ubuntu") and (elastic_elasticsearch_install)
+  tags:
+      - elasticsearch
+
+- name: Adjust Elasticsearch Launch Configuration
+  become: yes
+  lineinfile:
+      dest: /etc/sysconfig/elasticsearch
+      regexp: '^#JAVA_HOME='
+      line: "JAVA_HOME={{ jdk_global_jdk_directory }}"
+      state: present
+  when: (ansible_distribution == "RedHat") and (elastic_elasticsearch_install)
+  tags:
+      - elasticsearch
 
 # Not sure how stable the interface is but works with my Vagrant boxes
 - name: Install Customized Elasticsearch Configuration
@@ -39,23 +81,40 @@
       dest: /etc/elasticsearch/elasticsearch.yml
       mode: 0644
       backup: yes
-  when: (ansible_distribution == "Ubuntu") and (elastic_elasticsearch_install)
+  when: elastic_elasticsearch_install
+  tags:
+      - elasticsearch
 
 - name: Enable Elasticsearch
   become: yes
   shell: systemctl daemon-reload && systemctl enable elasticsearch.service
   when: elastic_elasticsearch_install
+  tags:
+      - elasticsearch
 
 - name: Start Elasticsearch
   become: yes
   command: systemctl restart elasticsearch.service
   when: elastic_elasticsearch_install
+  tags:
+      - elasticsearch
 
-# not working for some reason
+- name: Give Elasticsearch A Second To Fully Start Up
+  become: no
+  pause:
+      seconds: 5
+  when: false
+  tags:
+      - elasticsearch
+
+# Not working for some reason
 - name: Test Elasticsearch
   become: no
-  command: "curl -XGET 'localhost:9200/?pretty'"
+  uri:
+      url: "http://{{ ansible_host }}:9200/?pretty"
   when: false
+  tags:
+      - elasticsearch
 
 - name: Install Kibana
   become: yes

@@ -1,3 +1,3 @@
 #!/bin/bash
 
-ansible-playbook --verbose --inventory-file inventory --user vagrant --ask-pass --become-user root --ask-become-pass test.yml
+ansible-playbook --tags elasticsearch --verbose --inventory-file inventory --user ec2-user --become-user root --private-key /home/vagrant/Bitbucket/Operations/aws-ssh-keys/us-west-2/asgard-lite-test.pem test.yml
