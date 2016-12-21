@@ -11,6 +11,7 @@
       - logstash
       - filebeat
       - metricbeat
+      - packetbeat
 
 - name: Install Elasticsearch Repository
   become: yes
@@ -24,6 +25,7 @@
       - logstash
       - filebeat
       - metricbeat
+      - packetbeat
 
 - name: Install Elasticsearch Repository
   become: yes
@@ -41,6 +43,7 @@
       - logstash
       - filebeat
       - metricbeat
+      - packetbeat
 
 - name: Install Elasticsearch
   become: yes
@@ -382,6 +385,18 @@
       state: present
       allow_unauthenticated: yes
   when: (ansible_distribution == "Ubuntu") and (elastic_packetbeat_install)
+  tags:
+      - packetbeat
+
+- name: Install Packetbeat
+  become: yes
+  yum:
+        name: packetbeat
+        state: present
+        update_cache: yes
+  when: (ansible_distribution == "RedHat") and (elastic_packetbeat_install)
+  tags:
+      - packetbeat
 
 - name: Install Custom Packetbeat Configuration
   become: yes
@@ -391,16 +406,22 @@
       mode: 0644
       backup: yes
   when: elastic_packetbeat_install
+  tags:
+      - packetbeat
 
 - name: Enable Packetbeat
   become: yes
   shell: systemctl daemon-reload && systemctl enable packetbeat
   when: elastic_packetbeat_install
+  tags:
+      - packetbeat
 
 - name: Start Packetbeat
   become: yes
   command: systemctl restart packetbeat
   when: elastic_packetbeat_install
+  tags:
+      - packetbeat
 
 # all beats have the script but you only need to run it once
 # TODO: figure out a way to determine if we need to run the script or not
