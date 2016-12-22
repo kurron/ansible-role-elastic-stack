@@ -430,7 +430,7 @@
   command: "./scripts/import_dashboards -es http://127.0.0.1:9200"
   args:
       chdir: /usr/share/metricbeat
-  when: elastic_metricbeat_install or elastic_filebeat_install or elastic_packetbeat_install
+  when: elastic_elasticsearch_install and (elastic_metricbeat_install or elastic_filebeat_install or elastic_packetbeat_install)
   tags:
       - filebeat
       - metricbeat
